@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>💜 Nerdy & Flirty Crossword</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#1b0b2a;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.12);
+      --text:#f5f7ff;
+      --muted:rgba(245,247,255,.7);
+      --accent:#7c3aed;
+      --accent2:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --good:#10b981;
+      --cell:#0f1733;
+      --cell2:#101a3a;
+      --block:rgba(255,255,255,.06);
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --grid: 15;
+      --cellSize: 38px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1100px 600px at 15% 10%, rgba(124,58,237,.45), transparent 55%),
+        radial-gradient(1000px 520px at 85% 15%, rgba(34,197,94,.25), transparent 55%),
+        radial-gradient(900px 520px at 55% 90%, rgba(245,158,11,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px 18px 36px;
+    }
+
+    header{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .title h1{
+      margin:0;
+      font-size:clamp(22px, 3.1vw, 36px);
+      line-height:1.05;
+      letter-spacing:.2px;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      max-width:70ch;
+    }
+
+    .pillrow{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      color:var(--text);
+      user-select:none;
+    }
+    .pill b{font-weight:700}
+    .pill small{color:var(--muted)}
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr; }
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .cardHead{
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    }
+
+    .cardHead h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.3px;
+      color:rgba(245,247,255,.92);
+    }
+
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,.10);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+      transition: transform .08s ease, background .18s ease, border-color .18s ease;
+      font-weight:650;
+      letter-spacing:.2px;
+    }
+    button:hover{ transform: translateY(-1px); background:rgba(255,255,255,.14); }
+    button:active{ transform: translateY(0px) scale(.99); }
+    button.primary{
+      background: linear-gradient(135deg, rgba(124,58,237,.9), rgba(34,197,94,.7));
+      border-color: rgba(255,255,255,.22);
+    }
+    button.warn{
+      background: linear-gradient(135deg, rgba(245,158,11,.9), rgba(124,58,237,.55));
+      border-color: rgba(255,255,255,.22);
+    }
+    button.ghost{
+      background: transparent;
+      border-color: rgba(255,255,255,.14);
+    }
+
+    .gridWrap{
+      padding:16px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(var(--grid), var(--cellSize));
+      grid-template-rows: repeat(var(--grid), var(--cellSize));
+      gap:6px;
+      padding:12px;
+      border-radius:18px;
+      background: rgba(0,0,0,.15);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .cell{
+      position:relative;
+      width:var(--cellSize);
+      height:var(--cellSize);
+      border-radius:10px;
+      background: linear-gradient(180deg, var(--cell2), var(--cell));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 18px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .cell.block{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:none;
+      opacity:.75;
+    }
+
+    .cell input{
+      width:100%;
+      height:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:18px;
+      font-weight:800;
+      text-transform:uppercase;
+      text-align:center;
+      caret-color: transparent;
+    }
+
+    .num{
+      position:absolute;
+      top:5px; left:6px;
+      font-size:10px;
+      color:rgba(245,247,255,.75);
+      font-weight:700;
+      pointer-events:none;
+    }
+
+    .cell.correct{
+      border-color: rgba(16,185,129,.55);
+      box-shadow: 0 10px 22px rgba(16,185,129,.18);
+    }
+    .cell.wrong{
+      border-color: rgba(239,68,68,.55);
+      box-shadow: 0 10px 22px rgba(239,68,68,.12);
+    }
+    .cell.highlight{
+      outline: 2px solid rgba(245,158,11,.65);
+      outline-offset: 1px;
+    }
+
+    .panel{
+      padding:14px 16px 16px;
+      display:grid;
+      gap:14px;
+    }
+
+    .status{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .status .left{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .badge{
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:800;
+      letter-spacing:.3px;
+      background:rgba(124,58,237,.22);
+      border:1px solid rgba(124,58,237,.35);
+    }
+    .badge.good{
+      background:rgba(16,185,129,.18);
+      border-color: rgba(16,185,129,.35);
+    }
+    .badge.warn{
+      background:rgba(245,158,11,.18);
+      border-color: rgba(245,158,11,.35);
+    }
+
+    .clues{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 980px){
+      .clues{grid-template-columns:1fr;}
+    }
+
+    .clueBox{
+      background:rgba(0,0,0,.14);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:12px 12px;
+    }
+    .clueBox h3{
+      margin:0 0 8px 0;
+      font-size:13px;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      color:rgba(245,247,255,.85);
+      display:flex; gap:8px; align-items:center;
+    }
+    .clueList{
+      margin:0;
+      padding-left:18px;
+      display:grid;
+      gap:8px;
+      color:rgba(245,247,255,.88);
+    }
+    .clueList li{
+      line-height:1.25;
+    }
+    .clueList b{
+      color:rgba(245,247,255,.95);
+    }
+    .tiny{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:rgba(15,23,42,.92);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      display:none;
+      gap:10px;
+      align-items:center;
+      max-width:min(640px, 92vw);
+      z-index:50;
+    }
+    .toast.show{ display:flex; }
+    .spark{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 18px rgba(124,58,237,.6);
+    }
+
+    /* confetti */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:40;
+    }
+  </style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="title">
+      <h1>💜 Nerdy & Flirty Crossword</h1>
+      <p>
+        A colorful little puzzle stitched together from your vibes: quantum jokes, telescopes, sax vs trumpet,
+        water taxis, and that “we’re going UPP… because the only way to go is UP!” energy.
+      </p>
+    </div>
+
+    <div class="pillrow">
+      <div class="pill"><b>Tip:</b> <small>Use arrow keys. Backspace moves back.</small></div>
+      <div class="pill"><b>Mode:</b> <small>Across/Down auto-highlights.</small></div>
+      <div class="pill"><b>Vibe:</b> <small>Playful. Mildly flirty. Very nerdy.</small></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="card">
+      <div class="cardHead">
+        <h2>🧩 Grid</h2>
+        <div class="actions">
+          <button class="primary" id="btnCheck">Check</button>
+          <button class="warn" id="btnHint">Hint</button>
+          <button class="ghost" id="btnRevealWord">Reveal Word</button>
+          <button class="ghost" id="btnReset">New Puzzle</button>
+        </div>
+      </div>
+      <div class="gridWrap">
+        <div id="grid" class="grid" aria-label="Crossword grid"></div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="cardHead">
+        <h2>🗝️ Clues</h2>
+        <div class="actions">
+          <button id="btnRevealAll">Reveal All</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="status">
+          <div class="left">
+            <span class="badge" id="badgeScore">0% solved</span>
+            <span class="badge warn" id="badgeFocus">No word selected</span>
+          </div>
+          <div class="tiny" id="statusText">
+            Click a cell to start. If you get stuck, flirt with the “Hint” button. (It likes attention.)
+          </div>
+        </div>
+
+        <div class="clues">
+          <div class="clueBox">
+            <h3>➡️ Across</h3>
+            <ol class="clueList" id="acrossList"></ol>
+          </div>
+          <div class="clueBox">
+            <h3>⬇️ Down</h3>
+            <ol class="clueList" id="downList"></ol>
+          </div>
+        </div>
+
+        <p class="tiny">
+          Built-in theme words include: SCHRODINGER, TELESCOPE, OBSERVATORY, WATERTAXI, SAX, TRUMPET, UNICORN, HIGHNOTE, and more.
+          (Yes, it’s basically your chat… but in puzzle form.)
+        </p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="spark"></span><span id="toastText"></span></div>
+
+<script>
+/**
+ * Crossword generator (single-file, no libraries).
+ * - Greedy placement with restarts + crossings.
+ * - Builds numbering + clue lists for Across/Down.
+ * - Colorful UI + check/hint/reveal + confetti on solve.
+ */
+
+const GRID_SIZE = 15;
+
+// Words are derived from your chat + a few extras to make crossings work.
+// Keep them A–Z only, no spaces.
+const WORDS = [
+  { answer: "SCHRODINGER", clue: "Quantum mascot: simultaneously “texting back” and “not texting back.”" },
+  { answer: "TELESCOPE", clue: "A “no cheap one!” kind of dream lens for stargazing (and maybe staring at each other). 😉" },
+  { answer: "OBSERVATORY", clue: "Your future hangout: come for the stars, stay for the conversation." },
+  { answer: "WATERTAXI", clue: "Island teleportation… with sea breeze and timing debates." },
+  { answer: "SAX", clue: "The rival instrument that tries to steal the spotlight." },
+  { answer: "TRUMPET", clue: "Brassy main character energy. Loud enough to confess feelings in 4 bars." },
+  { answer: "HIGHNOTE", clue: "How you *ended the night*… and possibly how hearts got snatched." },
+  { answer: "UNICORN", clue: "Rare, magical, slightly chaotic… and apparently a political party mascot too." },
+  { answer: "UPP", clue: "Three letters. One direction. Zero chill. (Also: going ___.)" },
+  { answer: "NERDTALK", clue: "The love language of people who build planes… and metaphors." },
+  { answer: "PILOT", clue: "Dream job: fly high, land smooth, look cool doing it." },
+  { answer: "SMILE", clue: "A small curve that can cause a surprisingly large butterfly effect." },
+  { answer: "CHAOS", clue: "What happens when you toss keys in the garbage… accidentally." },
+  { answer: "NEVIS", clue: "A “well accepted fact” of niceness. (Also: a great excuse for a day trip.)" },
+  { answer: "OASIS", clue: "Desert metaphor for meeting someone refreshing. Hydration optional." },
+  { answer: "EMPATH", clue: "Feels everything… including when someone’s flirting in lowercase." },
+];
+
+// ---------- Utility ----------
+const rand = (n) => Math.floor(Math.random() * n);
+const shuffle = (arr) => arr.map(v => [Math.random(), v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+const clean = (s) => s.toUpperCase().replace(/[^A-Z]/g, "");
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  const t  = document.getElementById("toastText");
+  t.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2200);
+}
+
+function makeEmptyGrid(){
+  const g = [];
+  for(let r=0;r<GRID_SIZE;r++){
+    g[r]=[];
+    for(let c=0;c<GRID_SIZE;c++){
+      g[r][c]=null; // {ch, id}
+    }
+  }
+  return g;
+}
+
+function inBounds(r,c){ return r>=0 && c>=0 && r<GRID_SIZE && c<GRID_SIZE; }
+
+function canPlace(grid, word, r, c, dir){
+  // dir: 0=across, 1=down
+  const dr = dir===1 ? 1 : 0;
+  const dc = dir===0 ? 1 : 0;
+
+  // must fit
+  const endR = r + dr*(word.length-1);
+  const endC = c + dc*(word.length-1);
+  if(!inBounds(r,c) || !inBounds(endR,endC)) return false;
+
+  // boundary: before/after should be empty to avoid accidental concatenation
+  const beforeR = r - dr, beforeC = c - dc;
+  const afterR  = endR + dr, afterC = endC + dc;
+  if(inBounds(beforeR,beforeC) && grid[beforeR][beforeC]) return false;
+  if(inBounds(afterR,afterC) && grid[afterR][afterC]) return false;
+
+  // check each cell matches or empty; also avoid side-adjacent letters (for cleanliness)
+  for(let i=0;i<word.length;i++){
+    const rr = r + dr*i;
+    const cc = c + dc*i;
+    const cell = grid[rr][cc];
+    const ch = word[i];
+
+    if(cell && cell.ch !== ch) return false;
+
+    // side adjacency: if placing across, then up/down neighbors of each new cell should be empty unless it's a crossing
+    if(!cell){
+      if(dir===0){
+        if(inBounds(rr-1,cc) && grid[rr-1][cc]) return false;
+        if(inBounds(rr+1,cc) && grid[rr+1][cc]) return false;
+      }else{
+        if(inBounds(rr,cc-1) && grid[rr][cc-1]) return false;
+        if(inBounds(rr,cc+1) && grid[rr][cc+1]) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function placeWord(grid, wordObj, r, c, dir, wordId){
+  const word = wordObj.answer;
+  const dr = dir===1 ? 1 : 0;
+  const dc = dir===0 ? 1 : 0;
+
+  for(let i=0;i<word.length;i++){
+    const rr = r + dr*i;
+    const cc = c + dc*i;
+    if(!grid[rr][cc]){
+      grid[rr][cc] = { ch: word[i], id: new Set([wordId]) };
+    } else {
+      grid[rr][cc].id.add(wordId);
+    }
+  }
+  return { r, c, dir, ...wordObj, id: wordId };
+}
+
+function tryGenerate(){
+  // restarts to improve chance of clean fill
+  const MAX_RESTARTS = 140;
+
+  const base = WORDS.map(w => ({...w, answer: clean(w.answer)}))
+                   .filter(w => w.answer.length >= 3)
+                   .sort((a,b)=>b.answer.length - a.answer.length);
+
+  for(let attempt=0; attempt<MAX_RESTARTS; attempt++){
+    const grid = makeEmptyGrid();
+    const placed = [];
+    const list = shuffle(base);
+
+    // place first word near center, across
+    const first = list[0];
+    const startR = Math.floor(GRID_SIZE/2);
+    const startC = Math.floor((GRID_SIZE - first.answer.length)/2);
+    if(!canPlace(grid, first.answer, startR, startC, 0)) continue;
+    placed.push(placeWord(grid, first, startR, startC, 0, 0));
+
+    // place rest
+    let okCount = 1;
+    for(let wi=1; wi<list.length; wi++){
+      const w = list[wi];
+      const word = w.answer;
+      let best = null;
+
+      // Try to cross existing letters
+      for(let i=0;i<word.length;i++){
+        const letter = word[i];
+        for(let r=0;r<GRID_SIZE;r++){
+          for(let c=0;c<GRID_SIZE;c++){
+            const cell = grid[r][c];
+            if(cell && cell.ch === letter){
+              // candidate across (crossing down) OR down (crossing across)
+              // if we place across, this letter will be at (r, c) => start col = c-i
+              let sr = r, sc = c - i, dir = 0;
+              if(canPlace(grid, word, sr, sc, dir)){
+                best = {r:sr,c:sc,dir};
+                break;
+              }
+              // if place down
+              sr = r - i; sc = c; dir = 1;
+              if(canPlace(grid, word, sr, sc, dir)){
+                best = {r:sr,c:sc,dir};
+                break;
+              }
+            }
+          }
+          if(best) break;
+        }
+        if(best) break;
+      }
+
+      // If no crossing, try random placements (a few tries)
+      if(!best){
+        for(let t=0;t<80;t++){
+          const dir = rand(2);
+          const r = rand(GRID_SIZE);
+          const c = rand(GRID_SIZE);
+          if(canPlace(grid, word, r, c, dir)){
+            best = {r,c,dir};
+            break;
+          }
+        }
+      }
+
+      if(best){
+        placed.push(placeWord(grid, w, best.r, best.c, best.dir, wi));
+        okCount++;
+      }
+    }
+
+    // success criteria: place at least 11 words
+    if(okCount >= 11){
+      return { grid, placed };
+    }
+  }
+
+  return null;
+}
+
+// ---------- Build numbering + clues ----------
+function buildNumbers(grid){
+  // Determine start-of-word cells for across/down
+  const numGrid = Array.from({length:GRID_SIZE}, ()=>Array(GRID_SIZE).fill(0));
+  let n = 1;
+
+  function isBlock(r,c){ return !grid[r][c]; }
+
+  const starts = [];
+  for(let r=0;r<GRID_SIZE;r++){
+    for(let c=0;c<GRID_SIZE;c++){
+      if(isBlock(r,c)) continue;
+      const startsAcross = (c===0 || isBlock(r,c-1)) && (c+1<GRID_SIZE && !isBlock(r,c+1));
+      const startsDown   = (r===0 || isBlock(r-1,c)) && (r+1<GRID_SIZE && !isBlock(r+1,c));
+      if(startsAcross || startsDown){
+        numGrid[r][c] = n;
+        starts.push({r,c,num:n, startsAcross, startsDown});
+        n++;
+      }
+    }
+  }
+  return { numGrid, starts };
+}
+
+function collectClues(placed, numGrid){
+  // Map placed words to their starting number
+  const across = [];
+  const down = [];
+
+  for(const pw of placed){
+    const num = numGrid[pw.r][pw.c] || 0;
+    const entry = { num, clue: pw.clue, answer: pw.answer, r: pw.r, c: pw.c, dir: pw.dir };
+    if(pw.dir === 0) across.push(entry);
+    else down.push(entry);
+  }
+
+  // Sort by number then remove duplicates (in case a word placed on a non-numbered start due to adjacency rule changes)
+  const uniq = (arr) => {
+    const seen = new Set();
+    return arr
+      .filter(x => x.num > 0)
+      .sort((a,b)=>a.num-b.num)
+      .filter(x => {
+        const k = x.num + "|" + x.dir;
+        if(seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+  };
+
+  return { across: uniq(across), down: uniq(down) };
+}
+
+// ---------- Render ----------
+let state = {
+  solutionGrid: null,
+  inputs: null,
+  numGrid: null,
+  clues: null,
+  focus: { r:null, c:null, dir:0 }, // dir 0 across, 1 down
+  currentWord: null
+};
+
+function renderGrid(grid, numGrid){
+  const gridEl = document.getElementById("grid");
+  gridEl.style.setProperty("--grid", GRID_SIZE);
+  gridEl.innerHTML = "";
+
+  state.inputs = Array.from({length:GRID_SIZE}, ()=>Array(GRID_SIZE).fill(null));
+
+  for(let r=0;r<GRID_SIZE;r++){
+    for(let c=0;c<GRID_SIZE;c++){
+      const cell = document.createElement("div");
+      cell.className = "cell" + (grid[r][c] ? "" : " block");
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+
+      if(grid[r][c]){
+        const n = numGrid[r][c];
+        if(n){
+          const num = document.createElement("div");
+          num.className = "num";
+          num.textContent = n;
+          cell.appendChild(num);
+        }
+
+        const input = document.createElement("input");
+        input.maxLength = 1;
+        input.autocomplete = "off";
+        input.spellcheck = false;
+        input.inputMode = "text";
+        input.dataset.r = r;
+        input.dataset.c = c;
+
+        input.addEventListener("focus", ()=> setFocus(r,c));
+        input.addEventListener("click", ()=> setFocus(r,c));
+
+        input.addEventListener("keydown", (e)=> onKey(e, r, c));
+        input.addEventListener("input", (e)=> {
+          const v = (e.target.value || "").toUpperCase().replace(/[^A-Z]/g,"");
+          e.target.value = v;
+          if(v){
+            moveNext(r,c);
+          }
+          updateHighlights();
+          updateScore(false);
+        });
+
+        state.inputs[r][c] = input;
+        cell.appendChild(input);
+      }
+
+      gridEl.appendChild(cell);
+    }
+  }
+}
+
+function renderClues({across, down}){
+  const aEl = document.getElementById("acrossList");
+  const dEl = document.getElementById("downList");
+  aEl.innerHTML = "";
+  dEl.innerHTML = "";
+
+  const mk = (item) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<b>${item.num}.</b> ${escapeHTML(item.clue)}`;
+    li.style.cursor = "pointer";
+    li.addEventListener("click", ()=>{
+      state.focus.dir = item.dir;
+      focusAt(item.r, item.c);
+      toast(`Jumped to ${item.dir===0?"Across":"Down"} ${item.num} ✨`);
+    });
+    return li;
+  };
+
+  across.forEach(x => aEl.appendChild(mk(x)));
+  down.forEach(x => dEl.appendChild(mk(x)));
+}
+
+function escapeHTML(s){
+  return (s+"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ---------- Focus & movement ----------
+function setFocus(r,c){
+  if(state.solutionGrid[r][c] == null) return;
+
+  // If clicked within current word, keep dir; else decide based on availability
+  if(state.focus.r === r && state.focus.c === c){
+    // toggle direction if user clicks same cell again
+    state.focus.dir = state.focus.dir === 0 ? 1 : 0;
+  } else {
+    state.focus.r = r; state.focus.c = c;
+    // pick a direction that forms a word
+    const hasAcross = (c+1<GRID_SIZE && state.solutionGrid[r][c+1]) || (c-1>=0 && state.solutionGrid[r][c-1]);
+    const hasDown   = (r+1<GRID_SIZE && state.solutionGrid[r+1][c]) || (r-1>=0 && state.solutionGrid[r-1][c]);
+    if(hasAcross && !hasDown) state.focus.dir = 0;
+    else if(!hasAcross && hasDown) state.focus.dir = 1;
+    // else keep current
+  }
+
+  updateHighlights();
+  updateFocusBadge();
+}
+
+function focusAt(r,c){
+  const inp = state.inputs[r][c];
+  if(inp){
+    inp.focus();
+    inp.select?.();
+  }
+}
+
+function onKey(e, r, c){
+  const key = e.key;
+
+  if(key === "ArrowRight"){ e.preventDefault(); state.focus.dir=0; focusAt(r, c+1); return; }
+  if(key === "ArrowLeft"){ e.preventDefault(); state.focus.dir=0; focusAt(r, c-1); return; }
+  if(key === "ArrowDown"){ e.preventDefault(); state.focus.dir=1; focusAt(r+1, c); return; }
+  if(key === "ArrowUp"){ e.preventDefault(); state.focus.dir=1; focusAt(r-1, c); return; }
+
+  if(key === "Tab"){
+    // keep default, but update highlights after
+    setTimeout(updateHighlights, 0);
+    return;
+  }
+
+  if(key === "Backspace"){
+    const inp = state.inputs[r][c];
+    if(inp && inp.value){
+      // clear current
+      inp.value = "";
+      e.preventDefault();
+      updateHighlights();
+      updateScore(false);
+      return;
+    }
+    // move prev then clear
+    e.preventDefault();
+    movePrev(r,c);
+    const prev = state.inputs[state.focus.r][state.focus.c];
+    if(prev){ prev.value=""; }
+    updateHighlights();
+    updateScore(false);
+    return;
+  }
+
+  if(key === "Enter"){
+    e.preventDefault();
+    state.focus.dir = state.focus.dir===0 ? 1 : 0;
+    updateHighlights();
+    updateFocusBadge();
+    return;
+  }
+}
+
+function moveNext(r,c){
+  const dir = state.focus.dir;
+  const nr = r + (dir===1 ? 1 : 0);
+  const nc = c + (dir===0 ? 1 : 0);
+  if(inBounds(nr,nc) && state.solutionGrid[nr][nc]){
+    focusAt(nr,nc);
+  }
+}
+
+function movePrev(r,c){
+  const dir = state.focus.dir;
+  const nr = r - (dir===1 ? 1 : 0);
+  const nc = c - (dir===0 ? 1 : 0);
+  if(inBounds(nr,nc) && state.solutionGrid[nr][nc]){
+    state.focus.r = nr; state.focus.c = nc;
+    focusAt(nr,nc);
+  }
+}
+
+// Highlight current word cells
+function getCurrentWordCells(){
+  const r0 = state.focus.r, c0 = state.focus.c;
+  if(r0==null || c0==null) return [];
+  if(!state.solutionGrid[r0][c0]) return [];
+
+  const dir = state.focus.dir;
+  const dr = dir===1 ? 1 : 0;
+  const dc = dir===0 ? 1 : 0;
+
+  // walk to start
+  let r = r0, c = c0;
+  while(inBounds(r-dr,c-dc) && state.solutionGrid[r-dr][c-dc]){
+    r -= dr; c -= dc;
+  }
+  // collect
+  const cells = [];
+  while(inBounds(r,c) && state.solutionGrid[r][c]){
+    cells.push({r,c});
+    r += dr; c += dc;
+  }
+  return cells;
+}
+
+function updateHighlights(){
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach(el => el.classList.remove("highlight"));
+
+  const wordCells = getCurrentWordCells();
+  for(const {r,c} of wordCells){
+    const el = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    if(el) el.classList.add("highlight");
+  }
+  state.currentWord = wordCells;
+  updateFocusBadge();
+}
+
+function updateFocusBadge(){
+  const badge = document.getElementById("badgeFocus");
+  if(!state.currentWord || state.currentWord.length===0){
+    badge.textContent = "No word selected";
+    badge.className = "badge warn";
+    return;
+  }
+  const num = state.numGrid[state.currentWord[0].r][state.currentWord[0].c] || "—";
+  badge.textContent = `${state.focus.dir===0?"Across":"Down"} ${num}`;
+  badge.className = "badge";
+}
+
+// ---------- Check / hint / reveal ----------
+function checkAll(){
+  let filled = 0, correct = 0;
+  for(let r=0;r<GRID_SIZE;r++){
+    for(let c=0;c<GRID_SIZE;c++){
+      if(!state.solutionGrid[r][c]) continue;
+      const inp = state.inputs[r][c];
+      const val = (inp.value || "").toUpperCase();
+      if(val) filled++;
+      const isCorrect = val && val === state.solutionGrid[r][c];
+      if(isCorrect) correct++;
+
+      const cellEl = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      cellEl.classList.remove("correct","wrong");
+      if(val){
+        cellEl.classList.add(isCorrect ? "correct" : "wrong");
+      }
+    }
+  }
+  toast(`Checked! ${correct}/${filled} correct. Keep going, legend. 😌`);
+  updateScore(true);
+}
+
+function hintOne(){
+  const cells = getCurrentWordCells();
+  if(cells.length===0){ toast("Click a word first 🙂"); return; }
+
+  // pick first incorrect/empty in current word
+  for(const {r,c} of cells){
+    const inp = state.inputs[r][c];
+    const sol = state.solutionGrid[r][c];
+    const val = (inp.value||"").toUpperCase();
+    if(val !== sol){
+      inp.value = sol;
+      const cellEl = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      cellEl.classList.remove("wrong");
+      cellEl.classList.add("correct");
+      toast("A tiny hint… because I’m nice like that. 💅");
+      updateScore(false);
+      return;
+    }
+  }
+  toast("That word is already flawless. Like… suspiciously flawless. 😏");
+}
+
+function revealWord(){
+  const cells = getCurrentWordCells();
+  if(cells.length===0){ toast("Pick a word first 🙂"); return; }
+  for(const {r,c} of cells){
+    state.inputs[r][c].value = state.solutionGrid[r][c];
+    const cellEl = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    cellEl.classList.remove("wrong");
+    cellEl.classList.add("correct");
+  }
+  toast("Revealed word. No judgement… only mild teasing. 😌");
+  updateScore(false);
+}
+
+function revealAll(){
+  for(let r=0;r<GRID_SIZE;r++){
+    for(let c=0;c<GRID_SIZE;c++){
+      if(!state.solutionGrid[r][c]) continue;
+      state.inputs[r][c].value = state.solutionGrid[r][c];
+      const cellEl = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      cellEl.classList.remove("wrong");
+      cellEl.classList.add("correct");
+    }
+  }
+  toast("Revealed everything. You’re still cute though. 😄");
+  updateScore(false);
+}
+
+function updateScore(fromCheck){
+  let total = 0, correct = 0;
+  for(let r=0;r<GRID_SIZE;r++){
+    for(let c=0;c<GRID_SIZE;c++){
+      if(!state.solutionGrid[r][c]) continue;
+      total++;
+      const val = (state.inputs[r][c].value||"").toUpperCase();
+      if(val && val === state.solutionGrid[r][c]) correct++;
+    }
+  }
+  const pct = total ? Math.round((correct/total)*100) : 0;
+  const badge = document.getElementById("badgeScore");
+  badge.textContent = `${pct}% solved`;
+  badge.className = "badge" + (pct===100 ? " good" : pct>=60 ? "" : " warn");
+
+  const statusText = document.getElementById("statusText");
+  if(pct===100){
+    statusText.textContent = "Solved! Look at you… dangerously competent. 💜";
+    confettiBurst();
+  } else if(fromCheck){
+    statusText.textContent = "Checked! Keep nudging letters into place. (Like feelings… but slower.)";
+  } else {
+    statusText.textContent = "Type away. If you get stuck, the Hint button is literally flirting with you.";
+  }
+}
+
+// ---------- Confetti ----------
+let confetti = { running:false, pieces:[] };
+function confettiBurst(){
+  if(confetti.running) return;
+  confetti.running = true;
+
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  const resize = ()=>{
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  };
+  resize();
+  window.addEventListener("resize", resize, { passive:true });
+
+  confetti.pieces = Array.from({length:170}, ()=>({
+    x: Math.random()*window.innerWidth,
+    y: -20 - Math.random()*window.innerHeight*0.3,
+    w: 6 + Math.random()*8,
+    h: 6 + Math.random()*12,
+    vx: -1.2 + Math.random()*2.4,
+    vy: 2.2 + Math.random()*4.8,
+    rot: Math.random()*Math.PI,
+    vr: -0.08 + Math.random()*0.16,
+    life: 220 + Math.random()*120
+  }));
+
+  let frame = 0;
+  (function tick(){
+    frame++;
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+
+    confetti.pieces.forEach(p=>{
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.vy *= 1.003; // gravity-ish
+      p.life -= 1;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+
+      // no fixed colors per instructions? (This is in HTML/JS, not matplotlib; safe to color.)
+      const grad = ctx.createLinearGradient(-p.w/2,-p.h/2,p.w/2,p.h/2);
+      grad.addColorStop(0, "rgba(124,58,237,.95)");
+      grad.addColorStop(1, "rgba(34,197,94,.85)");
+      ctx.fillStyle = grad;
+
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+
+    confetti.pieces = confetti.pieces.filter(p => p.life > 0 && p.y < window.innerHeight + 60);
+
+    if(frame < 260 && confetti.pieces.length){
+      requestAnimationFrame(tick);
+    } else {
+      confetti.running = false;
+      ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+      window.removeEventListener("resize", resize);
+    }
+  })();
+}
+
+// ---------- Start / regenerate ----------
+function newPuzzle(){
+  const result = tryGenerate();
+  if(!result){
+    alert("Could not generate a clean crossword this time. Refresh and try again.");
+    return;
+  }
+
+  const { grid, placed } = result;
+  state.solutionGrid = Array.from({length:GRID_SIZE}, ()=>Array(GRID_SIZE).fill(null));
+
+  // extract solution letters (for checking)
+  for(let r=0;r<GRID_SIZE;r++){
+    for(let c=0;c<GRID_SIZE;c++){
+      state.solutionGrid[r][c] = grid[r][c] ? grid[r][c].ch : null;
+    }
+  }
+
+  const { numGrid } = buildNumbers(state.solutionGrid);
+  state.numGrid = numGrid;
+
+  state.clues = collectClues(placed, numGrid);
+
+  renderGrid(state.solutionGrid, numGrid);
+  renderClues(state.clues);
+
+  // reset focus
+  state.focus = { r:null, c:null, dir:0 };
+  state.currentWord = null;
+
+  updateScore(false);
+  updateFocusBadge();
+  toast("New puzzle generated ✨ (Try not to flirt with the sax too much.)");
+}
+
+// ---------- Wire buttons ----------
+document.getElementById("btnCheck").addEventListener("click", checkAll);
+document.getElementById("btnHint").addEventListener("click", hintOne);
+document.getElementById("btnRevealWord").addEventListener("click", revealWord);
+document.getElementById("btnRevealAll").addEventListener("click", revealAll);
+document.getElementById("btnReset").addEventListener("click", newPuzzle);
+
+// Initialize
+newPuzzle();
+</script>
+</body>
+</html>
