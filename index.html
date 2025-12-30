@@ -92,13 +92,59 @@
 
     .layout{
       display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap:16px;
+      grid-template-columns: 1fr 1.3fr;  /* Changed from .95fr to 1.3fr for wider clues */
+      gap:20px;  /* Increased gap */
       align-items:start;
     }
 
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr; }
+      
+      :root{
+        --cellSize: 32px;  /* Smaller cells on mobile */
+      }
+      
+      .gridWrap{
+        padding:20px 10px;  /* Less padding on mobile */
+        overflow-x: auto;  /* Allow horizontal scroll if needed */
+        min-height: 550px;  /* Less height needed on mobile */
+      }
+      
+      .grid{
+        padding:12px;
+        margin:5px;
+        gap:4px;  /* Smaller gap on mobile */
+      }
+      
+      .cell input{
+        font-size:16px;  /* Slightly smaller font on mobile */
+      }
+      
+      .wrap{
+        padding:16px 12px 24px;  /* Tighter padding on mobile */
+      }
+      
+      header{
+        gap:12px;
+      }
+      
+      .title h1{
+        font-size:24px;  /* Smaller title on mobile */
+      }
+    }
+    
+    @media (max-width: 600px){
+      :root{
+        --cellSize: 28px;  /* Even smaller cells on very small screens */
+      }
+      
+      .grid{
+        gap:3px;
+      }
+      
+      .cell input{
+        font-size:14px;
+      }
     }
 
     .card{
@@ -106,7 +152,7 @@
       border:1px solid rgba(255,255,255,.12);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      overflow:hidden;
+      overflow:visible; /* Changed from hidden to visible */
     }
 
     .cardHead{
@@ -158,9 +204,11 @@
     }
 
     .gridWrap{
-      padding:16px;
+      padding:30px;
       display:flex;
       justify-content:center;
+      overflow:visible; /* Changed from auto to visible */
+      min-height: 700px; /* Ensure enough vertical space */
     }
 
     .grid{
@@ -168,10 +216,15 @@
       grid-template-columns: repeat(var(--grid), var(--cellSize));
       grid-template-rows: repeat(var(--grid), var(--cellSize));
       gap:6px;
-      padding:12px;
+      padding:20px;               /* extra breathing room */
+      margin:10px;                /* keeps the outer frame from clipping */
       border-radius:18px;
       background: rgba(0,0,0,.15);
       border:1px solid rgba(255,255,255,.10);
+      outline: 2px solid rgba(255,255,255,.08);
+      outline-offset: 8px;
+      width: fit-content;
+      height: fit-content;
     }
 
     .cell{
@@ -267,7 +320,7 @@
     .clues{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:12px;
+      gap:16px;  /* Increased from 12px */
     }
     @media (max-width: 980px){
       .clues{grid-template-columns:1fr;}
@@ -277,11 +330,11 @@
       background:rgba(0,0,0,.14);
       border:1px solid rgba(255,255,255,.10);
       border-radius:14px;
-      padding:12px 12px;
+      padding:16px 14px;  /* Increased padding */
     }
     .clueBox h3{
-      margin:0 0 8px 0;
-      font-size:13px;
+      margin:0 0 10px 0;  /* Increased bottom margin */
+      font-size:14px;  /* Increased font size */
       letter-spacing:.3px;
       text-transform:uppercase;
       color:rgba(245,247,255,.85);
@@ -289,10 +342,11 @@
     }
     .clueList{
       margin:0;
-      padding-left:18px;
+      padding-left:20px;  /* Increased from 18px */
       display:grid;
-      gap:8px;
+      gap:10px;  /* Increased from 8px */
       color:rgba(245,247,255,.88);
+      line-height:1.5;  /* Added line height for better readability */
     }
     .clueList li{
       line-height:1.25;
