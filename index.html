@@ -92,59 +92,13 @@
 
     .layout{
       display:grid;
-      grid-template-columns: 1fr 1.3fr;  /* Changed from .95fr to 1.3fr for wider clues */
-      gap:20px;  /* Increased gap */
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
       align-items:start;
     }
 
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr; }
-      
-      :root{
-        --cellSize: 32px;  /* Smaller cells on mobile */
-      }
-      
-      .gridWrap{
-        padding:20px 10px;  /* Less padding on mobile */
-        overflow-x: auto;  /* Allow horizontal scroll if needed */
-        min-height: 550px;  /* Less height needed on mobile */
-      }
-      
-      .grid{
-        padding:12px;
-        margin:5px;
-        gap:4px;  /* Smaller gap on mobile */
-      }
-      
-      .cell input{
-        font-size:16px;  /* Slightly smaller font on mobile */
-      }
-      
-      .wrap{
-        padding:16px 12px 24px;  /* Tighter padding on mobile */
-      }
-      
-      header{
-        gap:12px;
-      }
-      
-      .title h1{
-        font-size:24px;  /* Smaller title on mobile */
-      }
-    }
-    
-    @media (max-width: 600px){
-      :root{
-        --cellSize: 28px;  /* Even smaller cells on very small screens */
-      }
-      
-      .grid{
-        gap:3px;
-      }
-      
-      .cell input{
-        font-size:14px;
-      }
     }
 
     .card{
@@ -152,7 +106,7 @@
       border:1px solid rgba(255,255,255,.12);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      overflow:visible; /* Changed from hidden to visible */
+      overflow:visible;
     }
 
     .cardHead{
@@ -207,8 +161,8 @@
       padding:30px;
       display:flex;
       justify-content:center;
-      overflow:visible; /* Changed from auto to visible */
-      min-height: 700px; /* Ensure enough vertical space */
+      overflow:visible;
+      min-height: 700px;
     }
 
     .grid{
@@ -216,12 +170,12 @@
       grid-template-columns: repeat(var(--grid), var(--cellSize));
       grid-template-rows: repeat(var(--grid), var(--cellSize));
       gap:6px;
-      padding:20px;               /* extra breathing room */
-      margin:10px;                /* keeps the outer frame from clipping */
+      padding:20px;               /* extra breathing room so the frame never touches letters */
+      margin:10px;                 /* keeps the outer frame from clipping inside the card */
       border-radius:18px;
       background: rgba(0,0,0,.15);
       border:1px solid rgba(255,255,255,.10);
-      outline: 2px solid rgba(255,255,255,.08);
+      outline: 2px solid rgba(255,255,255,.08); /* frame sits outside without stealing space */
       outline-offset: 8px;
       width: fit-content;
       height: fit-content;
@@ -320,7 +274,7 @@
     .clues{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:16px;  /* Increased from 12px */
+      gap:12px;
     }
     @media (max-width: 980px){
       .clues{grid-template-columns:1fr;}
@@ -330,11 +284,11 @@
       background:rgba(0,0,0,.14);
       border:1px solid rgba(255,255,255,.10);
       border-radius:14px;
-      padding:16px 14px;  /* Increased padding */
+      padding:12px 12px;
     }
     .clueBox h3{
-      margin:0 0 10px 0;  /* Increased bottom margin */
-      font-size:14px;  /* Increased font size */
+      margin:0 0 8px 0;
+      font-size:13px;
       letter-spacing:.3px;
       text-transform:uppercase;
       color:rgba(245,247,255,.85);
@@ -342,11 +296,10 @@
     }
     .clueList{
       margin:0;
-      padding-left:20px;  /* Increased from 18px */
+      padding-left:18px;
       display:grid;
-      gap:10px;  /* Increased from 8px */
+      gap:8px;
       color:rgba(245,247,255,.88);
-      line-height:1.5;  /* Added line height for better readability */
     }
     .clueList li{
       line-height:1.25;
@@ -401,7 +354,10 @@
     <div class="title">
       <h1>💜 E & J's Crossword</h1>
       <p>
-        A colorful little puzzle stitched together from time we've shared so far!  Have fun, remember, reminisce and make this into another memorable moment to curl the corners of the lips (on your face) upwards!!😚
+        A colorful little puzzle stitched together from time we've shared so far! Have fun, remember, reminisce and make this into another memorable moment to curl the corners of the lips (on your face) upwards!!😚
+        <li>
+          Btw, this is generated from a pool of 25 words!  Click on "New Puzzle" to see what other words you might be interested in!! 🙂 
+        </li>
       </p>
     </div>
 
@@ -459,8 +415,8 @@
         </div>
 
         <p class="tiny">
-          Built-in theme words include: SCHRODINGER, TELESCOPE, OBSERVATORY, WATERTAXI, SAX, TRUMPET, UNICORN, HIGHNOTE, and more.
-          (Yes, it’s basically your chat… but in puzzle form.)
+          Built-in theme words include: ITISWHATITIS, COMMUNICATE, SCHRODINGER, TELESCOPE, OBSERVATORY, SLOWDOWN, WATERTAXI, SAX, TRUMPET, DADJOKE, SECRETS, TRAVEL, TOUCH, KISS, and more.
+          (Yes, it's basically our chat… but in puzzle form.)
         </p>
       </div>
     </aside>
@@ -486,18 +442,27 @@ const WORDS = [
   { answer: "TELESCOPE", clue: "A “no cheap one!” kind of dream lens for stargazing (and maybe staring at each other). 😉" },
   { answer: "OBSERVATORY", clue: "Your future hangout: come for the stars, stay for the conversation." },
   { answer: "WATERTAXI", clue: "Island teleportation… with sea breeze and timing debates." },
-  { answer: "SAX", clue: "The rival instrument that tries to steal the spotlight." },
-  { answer: "TRUMPET", clue: "Brassy main character energy. Loud enough to confess feelings in 4 bars." },
-  { answer: "HIGHNOTE", clue: "How you *ended the night*… and possibly how hearts got snatched." },
+  { answer: "SAX", clue: "Your instrument that tries to steal the spotlight from my trumpet." },
+  { answer: "TRUMPET", clue: "My brassy main character energy. Loud enough to confess feelings in 4 bars." },
+  { answer: "HIGHNOTE", clue: "How I *ended the night*… and possibly how your heart got snatched." },
   { answer: "UNICORN", clue: "Rare, magical, slightly chaotic… and apparently a political party mascot too." },
   { answer: "UPP", clue: "Three letters. One direction. Zero chill. (Also: going ___.)" },
   { answer: "NERDTALK", clue: "The love language of people who build planes… and metaphors." },
-  { answer: "PILOT", clue: "Dream job: fly high, land smooth, look cool doing it." },
-  { answer: "SMILE", clue: "A small curve that can cause a surprisingly large butterfly effect." },
+  { answer: "PILOT", clue: "Dream job we both share: fly high, land smooth, look cool doing it." },
+  { answer: "SMILE", clue: "Something I do whenever I think of you." },
   { answer: "CHAOS", clue: "What happens when you toss keys in the garbage… accidentally." },
-  { answer: "NEVIS", clue: "A “well accepted fact” of niceness. (Also: a great excuse for a day trip.)" },
+  { answer: "NEVIS", clue: "A \"well accepted fact\" of niceness. (Also: your island home.)" },
   { answer: "OASIS", clue: "Desert metaphor for meeting someone refreshing. Hydration optional." },
   { answer: "EMPATH", clue: "Feels everything… including when someone’s flirting in lowercase." },
+  { answer: "SLOWDOWN", clue: "Something we decided we had to do (shifting gears, not slamming brakes). 2 words!" },
+  { answer: "TOUCH", clue: "Something you know how to do to me very well. 😏" },
+  { answer: "ITISWHATITIS", clue: "Something I tend to say once we're at an impasse. 4 words, no spaces!" },
+  { answer: "COMMUNICATE", clue: "Something I do very well (no 5-page explanations needed)." },
+  { answer: "ONION", clue: "Something I will NEVER eat, no matter how it's buttered up and presented." },
+  { answer: "TRAVEL", clue: "Something you definitely must do together (passports ready!)." },
+  { answer: "SECRETS", clue: "Where we had our first meal together. 🍽️" },
+  { answer: "DADJOKE", clue: "Something others cringe at when I do them but you love when I do them. 2 words!" },
+  { answer: "KISS", clue: "Something we both enjoy doing but had to kinda stop doing for now." },
 ];
 
 // ---------- Utility ----------
@@ -584,7 +549,7 @@ function placeWord(grid, wordObj, r, c, dir, wordId){
 
 function tryGenerate(){
   // restarts to improve chance of clean fill
-  const MAX_RESTARTS = 140;
+  const MAX_RESTARTS = 200;  // Increased from 140
 
   const base = WORDS.map(w => ({...w, answer: clean(w.answer)}))
                    .filter(w => w.answer.length >= 3)
@@ -636,9 +601,9 @@ function tryGenerate(){
         if(best) break;
       }
 
-      // If no crossing, try random placements (a few tries)
+      // If no crossing, try random placements (more tries for better fill)
       if(!best){
-        for(let t=0;t<80;t++){
+        for(let t=0;t<120;t++){  // Increased from 80
           const dir = rand(2);
           const r = rand(GRID_SIZE);
           const c = rand(GRID_SIZE);
@@ -655,8 +620,8 @@ function tryGenerate(){
       }
     }
 
-    // success criteria: place at least 11 words
-    if(okCount >= 11){
+    // success criteria: place at least 16 words (increased from 11)
+    if(okCount >= 16){
       return { grid, placed };
     }
   }
